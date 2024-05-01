@@ -1,6 +1,5 @@
-// script that deletes all documents with
-name="Holberton school" in the collection school
+// script that deletes all documents with name="Holberton school" in the collection school
 db.school.remove(
-    { name: "Holberton school" },
-    { justOne: false }
+{ name: "Holberton school" },
+{ justOne: false }
 )
