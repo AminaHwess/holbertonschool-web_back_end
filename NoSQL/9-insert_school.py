@@ -8,5 +8,5 @@ import pymongo
 
 def insert_school(mongo_collection, **kwargs):
     """Insert a document into the mongo collection"""
-    dbresult = mongo_collection.insert(kwargs)
+    dbresult = mongo_collection.insert_one(kwargs)
     return dbresult.inserted_id
