@@ -37,8 +37,8 @@ class Server:
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """Simple pagination"""
         assert (
-            isinstance(page, int)
-            and isinstance(page_size, int)
+            type(page) is int
+            and type(page_size) is int
             and page > 0
             and page_size > 0
         )
