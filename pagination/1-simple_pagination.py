@@ -5,6 +5,7 @@ import math
 from typing import List
 
 
+
 class Server:
     """Server class to paginate a database of popular baby names."""
 
@@ -22,8 +23,8 @@ class Server:
             self.__dataset = dataset[1:]
 
         return self.__dataset
-
-    def index_range(page, page_size):
+    
+    def index_range(self, page, page_size):
         """The function should return a tuple of size
         two containing a start index and
         an end index corresponding to the range of indexes to
