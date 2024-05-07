@@ -4,7 +4,7 @@
 
 import csv
 import math
-from typing import List, Dict
+from typing import List
 
 
 class Server:
@@ -46,7 +46,7 @@ class Server:
         start_index, end_index = self.index_range(page, page_size)
         return self.dataset()[start_index:end_index]
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
         data = self.get_page(page, page_size)
         total_pages = math.ceil(len(self.dataset()) / page_size)
         if page - 1 < 1:
@@ -64,5 +64,5 @@ class Server:
             "data": data,
             "next_page": next_page,
             "prev_page": prev_page,
-            "total_pages": total_pages,
+            "total_pages": total_pages
         }
