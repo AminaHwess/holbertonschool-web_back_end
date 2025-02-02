@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 """MRU Caching"""
 
-BaseCaching = __import__('base_caching').BaseCaching
+BaseCaching = __import__("base_caching").BaseCaching
 
 
 class MRUCache(BaseCaching):
     """MRU Caching"""
+
     def __init__(self):
         """Initialize the class and call the parent class init"""
         super().__init__()
