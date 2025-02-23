@@ -4,6 +4,8 @@
 from typing import List
 import re
 import logging
+import os
+import mysql.connector
 
 
 class RedactingFormatter(logging.Formatter):
@@ -46,3 +48,18 @@ def get_logger() -> logging.Logger:
     streamHandler.setFormatter(RedactingFormatter)
     logger.addHandler(streamHandler)
     return logger
+
+
+def get_db():
+    """get_db function that  returns a connector to the database"""
+    dbUser = os.getenv("PERSONAL_DATA_DB_USERNAME")
+    dbPass = os.getenv("PERSONAL_DATA_DB_PASSWORD")
+    dbHost = os.getenv("PERSONAL_DATA_DB_HOST")
+    dbName = os.getenv("PERSONAL_DATA_DB_NAME")
+    dbConnection = mysql.connector.connect(
+        user=dbUser,
+        password=dbPass,
+        host=dbHost,
+        database=dbName
+    )
+    return dbConnection
