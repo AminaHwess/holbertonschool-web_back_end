@@ -1,39 +1,20 @@
 #!/usr/bin/env python3
-"""Regex-ing"""
-
-from typing import List
-import re
-import logging
+"""Encrypting passwords Check & valid password"""
 
 
-class RedactingFormatter(logging.Formatter):
-    """Redacting Formatter class"""
-
-    REDACTION = "*"
-    FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
-    SEPARATOR = ";"
-
-    def __init__(self, fields: List[str]):
-        """_init_ method"""
-        super(RedactingFormatter, self).__init__(self.FORMAT)
-        self.fields = fields
-
-    def format(self, record: logging.LogRecord) -> str:
-        """format method to filter values in incoming log records"""
-        return filter_datum(
-            self.fields, self.REDACTION, super().format(record), self.SEPARATOR
-        )
+import bcrypt
 
 
-def filter_datum(
-    fields: List[str], redaction: str, message: str, separator: str
-) -> str:
-    """filter_datum function"""
-    for field in fields:
-        message = re.sub(
-            f"{field}=.*?{separator}",
-            f"{field}={redaction}{separator}",
-            message
-        )
+def hash_password(password: str) -> bytes:
+    """hash_password function that  returns a salted, hashed password"""
+    bytes = password.encode("utf-8")
+    salt = bcrypt.gensalt()
+    hash = bcrypt.hashpw(bytes, salt)
+    return hash
 
-    return message
+
+def is_valid(hashed_password: bytes, password: str) -> bool:
+    """is_valid function that the provided password
+    matches the hashed password"""
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
+
