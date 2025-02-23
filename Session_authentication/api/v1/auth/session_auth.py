@@ -1,20 +1,35 @@
 #!/usr/bin/env python3
-"""Session authentication"""
+"""Module of Session authentication views
+"""
 
-from api.v1.auth.auth import Auth
-from uuid import uuid4
+from api.v1.views import app_views
+from flask import abort, jsonify, request
+from models.user import User
+from os import getenv
 
 
-class SessionAuth(Auth):
-    """SessionAuth class"""
+@app_views.route("/auth_session/login", methods=["POST"], strict_slashes=False)
+def login():
+    """POST /auth_session/login
+    """
+    email = request.form.get("email")
+    password = request.form.get("password")
+    if not email:
+        return jsonify({"error": "email missing"}), 400
+    if not password:
+        return jsonify({"error": "password missing"}), 400
 
-    user_id_by_session_id = {}
+    user = User.search({"email": email})
+    if not user:
+        return jsonify({"error": "no user found for this email"}), 404
+    for u in user:
+        if not u.is_valid_password(password):
+            return jsonify({"error": "wrong password"}), 401
 
-    def create_session(self, user_id: str = None) -> str:
-        """create_session method that creates a Session ID for a user_id"""
+    from api.v1.app import auth
 
-        if user_id is None or type(user_id) != str:
-            return None
-        sessionId = str(uuid4())
-        self.user_id_by_session_id[sessionId] = user_id
-        return sessionId
+    session_id = auth.create_session(user[0].id)
+    session_name = getenv("SESSION_NAME")
+    out = jsonify(user[0].to_json())
+    out.set_cookie(session_name, session_id)
+    return out
