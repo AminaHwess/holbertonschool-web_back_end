@@ -71,7 +71,7 @@ def main():
     cursor = dbConnection.cursor()
     cursor.execute("Select name, email, phone, ssn, password;")
     logger = get_logger()
-    for row in cursor: 
+    for row in cursor:
         msg = [
             f"name={row[0]};email={row[1]};phone={row[2]};ssn={row[3]};password={row[4]};ip={row[5]};last_login={row[6]};user_agent={row[7]};"
         ]
