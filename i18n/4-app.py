@@ -23,13 +23,17 @@ app.config.from_object(Config)
 def get_locale():
     """get_locale method that determine the best match
     with our supported languages for the client's browser"""
+    if "locale" in request.args:
+        locale = request.args["locale"]
+        if locale in Config.LANGUAGES:
+            return locale
     return request.accept_languages.best_match(Config.LANGUAGES)
 
 
 @app.route("/")
 def index():
     """index method to render default template"""
-    return render_template("3-index.html")
+    return render_template("4-index.html")
 
 
 if __name__ == "__main__":

@@ -8,6 +8,14 @@ app = Flask(__name__, template_folder="templates")
 babel = Babel(app)
 
 
+users = {
+    1: {"name": "Balou", "locale": "fr", "timezone": "Europe/Paris"},
+    2: {"name": "Beyonce", "locale": "en", "timezone": "US/Central"},
+    3: {"name": "Spock", "locale": "kg", "timezone": "Vulcan"},
+    4: {"name": "Teletubby", "locale": None, "timezone": "Europe/London"},
+}
+
+
 class Config:
     """config class for babel configuration"""
 
@@ -23,13 +31,17 @@ app.config.from_object(Config)
 def get_locale():
     """get_locale method that determine the best match
     with our supported languages for the client's browser"""
+    if "locale" in request.args:
+        locale = request.args["locale"]
+        if locale in Config.LANGUAGES:
+            return locale
     return request.accept_languages.best_match(Config.LANGUAGES)
 
 
 @app.route("/")
 def index():
     """index method to render default template"""
-    return render_template("3-index.html")
+    return render_template("5-index.html")
 
 
 if __name__ == "__main__":
