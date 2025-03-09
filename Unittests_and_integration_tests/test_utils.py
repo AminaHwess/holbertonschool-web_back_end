@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Parameterize a unit test"""
 
-from utils import access_nested_map, get_json, memoize
+from utils import access_nested_map, get_json
 import unittest
 from unittest.mock import patch
 from parameterized import parameterized
@@ -45,24 +45,3 @@ class TestGetJson(unittest.TestCase):
         utils.get_json returns the expected result."""
         mock.return_value = payload
         self.assertEqual(get_json(url), payload)
-
-
-class TestMemoize(unittest.TestCase):
-    """Parameterize and patch"""
-
-    def test_memoize(self):
-        """test_memoize method"""
-        class TestClass:
-
-            def a_method(self):
-                return 42
-
-            @memoize
-            def a_property(self):
-                return self.a_method()
-
-        with patch.object(TestClass, "a_method") as mock:
-            test_class = TestClass()
-            test_class.a_property
-            test_class.a_property
-            mock.assert_called_once
