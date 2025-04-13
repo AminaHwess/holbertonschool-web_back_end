@@ -21,6 +21,21 @@ def count_calls(method: Callable) -> Callable:
     return wrapper
 
 
+def call_history(method: Callable) -> Callable:
+    """Decorator to store the history of inputs and outputs for a function."""
+    input_key = method.__qualname__ + ":inputs"
+    output_key = method.__qualname__ + ":outputs"
+
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """Wrapper function to store input/output history and call original."""
+        self._redis.rpush(input_key, str(args))
+        output = method(self, *args, **kwargs)
+        self._redis.rpush(output_key, output)
+        return output
+    return wrapper
+
+
 class Cache:
     """Cache class to store data in redis db"""
 
@@ -28,6 +43,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
 
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """store method generate random key and
@@ -50,8 +66,8 @@ class Cache:
 
     def get_str(self, key: str) -> str:
         """will automatically parametrize Cache.get"""
-        self.get(key, fn=lambda d: d.decode("utf-8"))
+        return self.get(key, fn=lambda d: d.decode("utf-8"))
 
     def get_int(self, key: str) -> int:
         """will automatically parametrize Cache.get"""
-        self.get(key, fn=int)
+        return self.get(key, fn=int)
