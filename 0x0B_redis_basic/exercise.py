@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
+"""
+This module contains the Cache class and helper functions.
+"""
 import redis
 import uuid
 from functools import wraps
 from typing import Union, Callable
-
-"""
- Cache Class
- """
 
 
 def count_calls(method: Callable) -> Callable:
@@ -31,15 +30,38 @@ def call_history(method: Callable) -> Callable:
         """Wrapper function to store input/output history and call original."""
         self._redis.rpush(input_key, str(args))
         output = method(self, *args, **kwargs)
-        self._redis.rpush(output_key, output)
+        self._redis.rpush(output_key, str(output))
         return output
     return wrapper
+
+
+def replay(method: Callable):
+    """Display the history of calls of a particular function."""
+    r = redis.Redis()
+    method_name = method.__qualname__
+    input_key = method_name + ":inputs"
+    output_key = method_name + ":outputs"
+
+    count = r.get(method_name)
+    if count is None:
+        print(f'{method_name} was not called')
+        return
+
+    count = int(count)
+    print(f'{method_name} was called {count} times:')
+
+    inputs = r.lrange(input_key, 0, -1)
+    outputs = r.lrange(output_key, 0, -1)
+
+    for inp, out in zip(inputs, outputs):
+        print(f'{method_name}{inp.decode("utf-8")} -> {out.decode("utf-8")}')
 
 
 class Cache:
     """Cache class to store data in redis db"""
 
     def __init__(self):
+        """initialise redis client and flush db"""
         self._redis = redis.Redis()
         self._redis.flushdb()
 
@@ -54,20 +76,19 @@ class Cache:
 
     def get(self, key: str, fn: Callable = None)\
             -> Union[str, bytes, int, float, None]:
-        """will return converted data back to the desired format"""
+        """Retrieves data from redis, applying a conversion function if given.
+        """
         data = self._redis.get(key)
         if data is None:
             return None
-        else:
-            if fn is None:
-                return data
-            else:
-                return fn(data)
+        if fn:
+            return fn(data)
+        return data
 
     def get_str(self, key: str) -> str:
-        """will automatically parametrize Cache.get"""
-        return self.get(key, fn=lambda d: d.decode("utf-8"))
+        """Retrieves a string from redis."""
+        return self.get(key, lambda d: d.decode("utf-8"))
 
     def get_int(self, key: str) -> int:
-        """will automatically parametrize Cache.get"""
-        return self.get(key, fn=int)
+        """Retrieves an integer from redis."""
+        return self.get(key, int)
